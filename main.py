@@ -1,3 +1,15 @@
+"""
+This sets up a mini web server that:
+
+*   Starts by loading your machine learning model.
+*   Listens for incoming web requests at specific URLs (`/`, `/predict`).
+*   For prediction requests (`POST /predict`):
+    *   Validates the incoming customer data.
+    *   Uses the loaded model to make a churn prediction.
+    *   Sends the prediction back as a structured JSON response.
+*   Provides automatic interactive documentation (`/docs`).
+"""
+
 import joblib
 from fastapi import FastAPI
 from pydantic import BaseModel
