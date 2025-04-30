@@ -56,25 +56,21 @@ class InputFeatures(BaseModel):
     Monthly_Charge: float         = Field(..., alias="Monthly Charge")
     Satisfaction_Score: int       = Field(..., alias="Satisfaction Score")
 
-        class Config:
-            allow_population_by_field_name = True   # so you can send either style
-
     # Example for providing example data in the docs
     class Config:
         allow_population_by_field_name = True   # so you can send either style
-        
+
         schema_extra = {
             "example": {
-                "account_length": 100,
-                "total_day_minutes": 180.5,
-                "total_day_calls": 110,
-                "total_eve_minutes": 200.2,
-                "total_eve_calls": 90,
-                "total_night_minutes": 250.7,
-                "total_night_calls": 85,
-                "total_intl_minutes": 10.1,
-                "total_intl_calls": 3,
-                "number_customer_service_calls": 1
+                "Phone Service": true,
+                "Online Security": false,
+                "Online Backup": true,
+                "Premium Tech Support": false,
+                "Contract": "One year",
+                "Number of Referrals": 3,
+                "Tenure in Months": 27,
+                "Monthly Charge": 72.6,
+                "Satisfaction Score": 4
             }
         }
 
