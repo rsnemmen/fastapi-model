@@ -20,7 +20,7 @@ import os # To build file paths reliably
 # Determine the absolute path to the model file
 # This makes the script work regardless of where you run it from
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "your_model.joblib")
+MODEL_PATH = os.path.join(BASE_DIR, "model.joblib")
 
 # --- Load the Model ---
 try:
@@ -41,22 +41,28 @@ app = FastAPI(title="Customer Churn Prediction API", version="0.1.0")
 # Pydantic models define the expected data shape, types, and perform validation.
 # Replace these feature names with the actual features your model expects.
 class InputFeatures(BaseModel):
-    # Example features - customize these!
-    account_length: int
-    total_day_minutes: float
-    total_day_calls: int
-    total_eve_minutes: float
-    total_eve_calls: int
-    total_night_minutes: float
-    total_night_calls: int
-    total_intl_minutes: float
-    total_intl_calls: int
-    number_customer_service_calls: int
-    # Add all other features your model was trained on
-    # Ensure the types (int, float, bool, str) match your data
+    # --- binary categorical ----
+    Phone_Service: bool           = Field(..., alias="Phone Service")
+    Online_Security: bool         = Field(..., alias="Online Security")
+    Online_Backup: bool           = Field(..., alias="Online Backup")
+    Premium_Tech_Support: bool    = Field(..., alias="Premium Tech Support")
+
+    # --- multi-class categorical ---
+    Contract: Literal["Month-to-month", "One year", "Two year"]
+
+    # --- numeric ---
+    Number_of_Referrals: int      = Field(..., alias="Number of Referrals")
+    Tenure_in_Months: int         = Field(..., alias="Tenure in Months")
+    Monthly_Charge: float         = Field(..., alias="Monthly Charge")
+    Satisfaction_Score: int       = Field(..., alias="Satisfaction Score")
+
+        class Config:
+            allow_population_by_field_name = True   # so you can send either style
 
     # Example for providing example data in the docs
     class Config:
+        allow_population_by_field_name = True   # so you can send either style
+        
         schema_extra = {
             "example": {
                 "account_length": 100,
