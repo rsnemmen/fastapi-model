@@ -12,7 +12,8 @@ This sets up a mini web server that:
 
 import joblib
 from fastapi import FastAPI
-from pydantic import BaseModel
+from typing import Literal
+from pydantic import BaseModel, Field
 import numpy as np # Assuming your model expects numpy arrays
 import os # To build file paths reliably
 
@@ -58,14 +59,14 @@ class InputFeatures(BaseModel):
 
     # Example for providing example data in the docs
     class Config:
-        allow_population_by_field_name = True   # so you can send either style
+        populate_by_name = True   # so you can send either style
 
-        schema_extra = {
+        json_schema_extra = {
             "example": {
-                "Phone Service": true,
-                "Online Security": false,
-                "Online Backup": true,
-                "Premium Tech Support": false,
+                "Phone Service": True,
+                "Online Security": False,
+                "Online Backup": True,
+                "Premium Tech Support": False,
                 "Contract": "One year",
                 "Number of Referrals": 3,
                 "Tenure in Months": 27,
