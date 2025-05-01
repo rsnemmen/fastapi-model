@@ -12,10 +12,13 @@ This sets up a mini web server that:
 
 import joblib
 from fastapi import FastAPI
-from typing import Literal
-from pydantic import BaseModel, Field
 import numpy as np # Assuming your model expects numpy arrays
 import os # To build file paths reliably
+
+# pydantic types
+from typing import Literal
+from pydantic import BaseModel, Field, conint
+from enum import Enum
 
 # --- Configuration ---
 # Determine the absolute path to the model file
@@ -41,21 +44,31 @@ app = FastAPI(title="Customer Churn Prediction API", version="0.1.0")
 # --- Define Input Data Structure using Pydantic ---
 # Pydantic models define the expected data shape, types, and perform validation.
 # Replace these feature names with the actual features your model expects.
+# 
+# CAREFUL: You should use exactly the same value types and spellings present in 
+# the training data!
+class YesNo(str, Enum):
+    yes = "Yes"
+    no  = "No"
+
 class InputFeatures(BaseModel):
     # --- binary categorical ----
-    Phone_Service: bool           = Field(..., alias="Phone Service")
-    Online_Security: bool         = Field(..., alias="Online Security")
-    Online_Backup: bool           = Field(..., alias="Online Backup")
-    Premium_Tech_Support: bool    = Field(..., alias="Premium Tech Support")
+    Phone_Service: YesNo           = Field(..., alias="Phone Service")
+    Online_Security: YesNo         = Field(..., alias="Online Security")
+    Online_Backup: YesNo           = Field(..., alias="Online Backup")
+    Premium_Tech_Support: YesNo    = Field(..., alias="Premium Tech Support")
 
     # --- multi-class categorical ---
-    Contract: Literal["Month-to-month", "One year", "Two year"]
+    Contract: Literal["Month-to-Month", "One Year", "Two Year"]
 
     # --- numeric ---
     Number_of_Referrals: int      = Field(..., alias="Number of Referrals")
     Tenure_in_Months: int         = Field(..., alias="Tenure in Months")
     Monthly_Charge: float         = Field(..., alias="Monthly Charge")
-    Satisfaction_Score: int       = Field(..., alias="Satisfaction Score")
+
+    # Satisfaction Score must be an integer ∈ [1, 5]
+    Satisfaction_Score: conint(ge=1, le=5) = Field(
+        ..., alias="Satisfaction Score"    )
 
     # Example for providing example data in the docs
     class Config:
@@ -63,11 +76,11 @@ class InputFeatures(BaseModel):
 
         json_schema_extra = {
             "example": {
-                "Phone Service": True,
-                "Online Security": False,
-                "Online Backup": True,
-                "Premium Tech Support": False,
-                "Contract": "One year",
+                "Phone Service": "Yes",
+                "Online Security": "No",
+                "Online Backup": "Yes",
+                "Premium Tech Support": "No",
+                "Contract": "One Year",
                 "Number of Referrals": 3,
                 "Tenure in Months": 27,
                 "Monthly Charge": 72.6,
