@@ -102,53 +102,19 @@ async def read_root():
 # response_model ensures the output conforms to PredictionOutput and helps docs
 @app.post("/predict", response_model=PredictionOutput)
 async def predict_churn(features: InputFeatures):
-    """
-    Predicts customer churn based on input features.
+    # 1️⃣  keep the column names that the model was trained with
+    df = pd.DataFrame([features.model_dump(by_alias=True)])
 
-    Takes customer characteristics as input and returns a churn prediction (0 or 1).
-    """
-    # 1. Convert Pydantic model to the format your model expects
-    #    Scikit-learn models usually expect a 2D array-like structure (e.g., list of lists or NumPy array)
-    #    The order of features MUST match the order used during training!
-    feature_values = [
-        features.Phone_Service,
-        features.Online_Security,
-        features.Online_Backup,
-        features.Premium_Tech_Support,
-        features.Contract,
-        features.Number_of_Referrals,
-        features.Tenure_in_Months,
-        features.Monthly_Charge
-    ]
-    # Convert to 2D NumPy array (as scikit-learn models expect samples in rows)
-    input_data = pd.DataFrame([feature_values])
-
-    # 2. Make prediction
     try:
-        prediction_result = model.predict(input_data)
-        # If you want probabilities: prediction_proba = model.predict_proba(input_data)
+        # 2️⃣  predict
+        pred = int(model.predict(df)[0])
     except Exception as e:
-        # Handle potential errors during prediction
-        # You might want to raise an HTTPException for client errors
-        # or log server errors.
-        print(f"Error during prediction: {e}")
-        # Example of returning an error response (optional)
-        # from fastapi import HTTPException
-        # raise HTTPException(status_code=500, detail="Prediction failed.")
-        # For now, let's return a default or error indicator if needed,
-        # but ideally, handle this more robustly.
-        # For simplicity here, we might just let it fail if predict errors.
-        # A better approach is specific error handling.
+        print(f"Error during prediction: {e}", flush=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
-    # 3. Format the output
-    # Assuming model.predict returns an array like [0] or [1]
-    predicted_class = int(prediction_result[0])
+    # 3️⃣  return
+    return PredictionOutput(churn_prediction=pred)
 
-    # If using predict_proba, you might extract the probability for the positive class
-    # positive_class_proba = float(prediction_proba[0][1]) # Assuming 1 is the positive class
-
-    # Return the result conforming to the PredictionOutput Pydantic model
-    return PredictionOutput(churn_prediction=predicted_class)
 
 # --- (Optional) Add other endpoints, e.g., for model info ---
 @app.get("/model_info")
