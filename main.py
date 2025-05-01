@@ -102,17 +102,17 @@ async def read_root():
 # response_model ensures the output conforms to PredictionOutput and helps docs
 @app.post("/predict", response_model=PredictionOutput)
 async def predict_churn(features: InputFeatures):
-    # 1️⃣  keep the column names that the model was trained with
+    # keep the column names that the model was trained with
     df = pd.DataFrame([features.model_dump(by_alias=True)])
 
     try:
-        # 2️⃣  predict
+        # predict
         pred = int(model.predict(df)[0])
     except Exception as e:
         print(f"Error during prediction: {e}", flush=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-    # 3️⃣  return
+    # return
     return PredictionOutput(churn_prediction=pred)
 
 
