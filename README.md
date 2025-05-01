@@ -68,3 +68,9 @@ The server will respond with a JSON object containing the prediction, such as:
 ```json
 {"churn_prediction": 1}
 ```
+
+## Challenges
+
+While writing this API, I spent most of my time figuring out how to specify the API input features vs those used to train the model. For the particular case study I used here, the scikit-learn pipeline was actually fed with 50 features, 42 of which are noninformative and eventually discarded. 
+
+I had to retrain the model to discard those features earlier in the training, because FastAPI wants exactly the same features you fed the model—even if they were discarded in the pipeline.
