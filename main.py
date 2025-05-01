@@ -14,6 +14,7 @@ import joblib
 from fastapi import FastAPI
 import numpy as np # Assuming your model expects numpy arrays
 import os # To build file paths reliably
+import pandas as pd
 
 # pydantic types
 from typing import Literal
@@ -66,10 +67,6 @@ class InputFeatures(BaseModel):
     Tenure_in_Months: int         = Field(..., alias="Tenure in Months")
     Monthly_Charge: float         = Field(..., alias="Monthly Charge")
 
-    # Satisfaction Score must be an integer ∈ [1, 5]
-    Satisfaction_Score: conint(ge=1, le=5) = Field(
-        ..., alias="Satisfaction Score"    )
-
     # Example for providing example data in the docs
     class Config:
         populate_by_name = True   # so you can send either style
@@ -84,7 +81,6 @@ class InputFeatures(BaseModel):
                 "Number of Referrals": 3,
                 "Tenure in Months": 27,
                 "Monthly Charge": 72.6,
-                "Satisfaction Score": 4
             }
         }
 
@@ -122,11 +118,10 @@ async def predict_churn(features: InputFeatures):
         features.Contract,
         features.Number_of_Referrals,
         features.Tenure_in_Months,
-        features.Monthly_Charge,
-        features.Satisfaction_Score
+        features.Monthly_Charge
     ]
     # Convert to 2D NumPy array (as scikit-learn models expect samples in rows)
-    input_data = np.array([feature_values])
+    input_data = pd.DataFrame([feature_values])
 
     # 2. Make prediction
     try:
