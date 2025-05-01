@@ -84,7 +84,7 @@ class PredictionOutput(BaseModel):
 # --- API Root Endpoint ---
 @app.get("/")
 async def read_root():
-    return {"message": "Welcome to the Customer Churn Prediction API!"}
+    return {"message": "Welcome to the Customer Churn Prediction API"}
 
 
 # --- Prediction Endpoint ---
@@ -101,17 +101,15 @@ async def predict_churn(features: InputFeatures):
     #    Scikit-learn models usually expect a 2D array-like structure (e.g., list of lists or NumPy array)
     #    The order of features MUST match the order used during training!
     feature_values = [
-        features.account_length,
-        features.total_day_minutes,
-        features.total_day_calls,
-        features.total_eve_minutes,
-        features.total_eve_calls,
-        features.total_night_minutes,
-        features.total_night_calls,
-        features.total_intl_minutes,
-        features.total_intl_calls,
-        features.number_customer_service_calls
-        # Add all other features in the correct order
+        features.Phone_Service,
+        features.Online_Security,
+        features.Online_Backup,
+        features.Premium_Tech_Support,
+        features.Contract,
+        features.Number_of_Referrals,
+        features.Tenure_in_Months,
+        features.Monthly_Charge,
+        features.Satisfaction_Score
     ]
     # Convert to 2D NumPy array (as scikit-learn models expect samples in rows)
     input_data = np.array([feature_values])
